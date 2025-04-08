@@ -137,6 +137,4 @@ CORS_ALLOW_METHODS = [
     "DELETE",
     "OPTIONS",
 ]
-CORS_ALLOW_HEADERS = [
-    "*",
-]
+CORS_ALLOW_HEADERS = ["*"]

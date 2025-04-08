@@ -1,14 +1,19 @@
+import logging
 from django.core.management.base import BaseCommand
-from octofit_tracker.models import User, Team, Activity, Leaderboard, Workout
-from django.conf import settings
 from pymongo import MongoClient
-from datetime import timedelta
 from bson import ObjectId
+from datetime import datetime
+from django.conf import settings
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Command(BaseCommand):
     help = 'Populate the database with test data for users, teams, activities, leaderboard, and workouts'
 
     def handle(self, *args, **kwargs):
+        logging.debug('Starting database population...')
+
         # Connect to MongoDB
         client = MongoClient(settings.DATABASES['default']['HOST'], settings.DATABASES['default']['PORT'])
         db = client[settings.DATABASES['default']['NAME']]
@@ -16,56 +21,58 @@ class Command(BaseCommand):
         # Drop existing collections
         db.users.drop()
         db.teams.drop()
-        db.activities.drop()
+        db.activity.drop()
         db.leaderboard.drop()
         db.workouts.drop()
+        logging.debug('Dropped existing collections.')
 
-        # Create users
+        # Insert users
         users = [
-            User(_id=ObjectId(), username='thundergod', email='thundergod@example.com', password='password1'),
-            User(_id=ObjectId(), username='metalgeek', email='metalgeek@example.com', password='password2'),
-            User(_id=ObjectId(), username='zerocool', email='zerocool@example.com', password='password3'),
-            User(_id=ObjectId(), username='crashoverride', email='crashoverride@example.com', password='password4'),
-            User(_id=ObjectId(), username='sleeptoken', email='sleeptoken@example.com', password='password5'),
+            {"_id": ObjectId(), "email": "thundergod@mhigh.edu", "name": "Thunder God", "created_at": datetime.utcnow()},
+            {"_id": ObjectId(), "email": "metalgeek@mhigh.edu", "name": "Metal Geek", "created_at": datetime.utcnow()},
+            {"_id": ObjectId(), "email": "zerocool@mhigh.edu", "name": "Zero Cool", "created_at": datetime.utcnow()},
+            {"_id": ObjectId(), "email": "crashoverride@hmhigh.edu", "name": "Crash Override", "created_at": datetime.utcnow()},
+            {"_id": ObjectId(), "email": "sleeptoken@mhigh.edu", "name": "Sleep Token", "created_at": datetime.utcnow()}
         ]
-        User.objects.bulk_create(users)
+        db.users.insert_many(users)
+        logging.debug(f'Inserted users: {users}')
 
-        # Create teams
-        team1 = Team(_id=ObjectId(), name='Blue Team')
-        team2 = Team(_id=ObjectId(), name='Gold Team')
-        team1.save()
-        team2.save()
-        team1.members.add(users[0], users[1])
-        team2.members.add(users[2], users[3], users[4])
+        # Insert teams
+        teams = [
+            {"_id": ObjectId(), "name": "Blue Team", "members": [users[0], users[1]]},
+            {"_id": ObjectId(), "name": "Gold Team", "members": [users[2], users[3], users[4]]}
+        ]
+        db.teams.insert_many(teams)
+        logging.debug(f'Inserted teams: {teams}')
 
-        # Create activities
+        # Insert activities
         activities = [
-            Activity(_id=ObjectId(), user=users[0], activity_type='Cycling', duration=timedelta(hours=1)),
-            Activity(_id=ObjectId(), user=users[1], activity_type='Crossfit', duration=timedelta(hours=2)),
-            Activity(_id=ObjectId(), user=users[2], activity_type='Running', duration=timedelta(hours=1, minutes=30)),
-            Activity(_id=ObjectId(), user=users[3], activity_type='Strength', duration=timedelta(minutes=30)),
-            Activity(_id=ObjectId(), user=users[4], activity_type='Swimming', duration=timedelta(hours=1, minutes=15)),
+            {"_id": ObjectId(), "user": users[0], "type": "Cycling", "duration": 60, "date": "2025-04-08"},
+            {"_id": ObjectId(), "user": users[1], "type": "Crossfit", "duration": 120, "date": "2025-04-07"},
+            {"_id": ObjectId(), "user": users[2], "type": "Running", "duration": 90, "date": "2025-04-06"},
+            {"_id": ObjectId(), "user": users[3], "type": "Strength", "duration": 30, "date": "2025-04-05"},
+            {"_id": ObjectId(), "user": users[4], "type": "Swimming", "duration": 75, "date": "2025-04-04"}
         ]
-        Activity.objects.bulk_create(activities)
+        db.activity.insert_many(activities)
+        logging.debug(f'Inserted activities: {activities}')
 
-        # Create leaderboard entries
-        leaderboard_entries = [
-            Leaderboard(_id=ObjectId(), user=users[0], score=100),
-            Leaderboard(_id=ObjectId(), user=users[1], score=90),
-            Leaderboard(_id=ObjectId(), user=users[2], score=95),
-            Leaderboard(_id=ObjectId(), user=users[3], score=85),
-            Leaderboard(_id=ObjectId(), user=users[4], score=80),
+        # Insert leaderboard entries
+        leaderboard = [
+            {"_id": ObjectId(), "team": teams[0], "score": 100},
+            {"_id": ObjectId(), "team": teams[1], "score": 90}
         ]
-        Leaderboard.objects.bulk_create(leaderboard_entries)
+        db.leaderboard.insert_many(leaderboard)
+        logging.debug(f'Inserted leaderboard entries: {leaderboard}')
 
-        # Create workouts
+        # Insert workouts
         workouts = [
-            Workout(_id=ObjectId(), name='Cycling Training', description='Training for a road cycling event'),
-            Workout(_id=ObjectId(), name='Crossfit', description='Training for a crossfit competition'),
-            Workout(_id=ObjectId(), name='Running Training', description='Training for a marathon'),
-            Workout(_id=ObjectId(), name='Strength Training', description='Training for strength'),
-            Workout(_id=ObjectId(), name='Swimming Training', description='Training for a swimming competition'),
+            {"_id": ObjectId(), "name": "Cycling Training", "description": "Training for a road cycling event"},
+            {"_id": ObjectId(), "name": "Crossfit", "description": "Training for a crossfit competition"},
+            {"_id": ObjectId(), "name": "Running Training", "description": "Training for a marathon"},
+            {"_id": ObjectId(), "name": "Strength Training", "description": "Training for strength"},
+            {"_id": ObjectId(), "name": "Swimming Training", "description": "Training for a swimming competition"}
         ]
-        Workout.objects.bulk_create(workouts)
+        db.workouts.insert_many(workouts)
+        logging.debug(f'Inserted workouts: {workouts}')
 
-        self.stdout.write(self.style.SUCCESS('Successfully populated the database with test data.'))
+        self.stdout.write(self.style.SUCCESS('Successfully populated the database with test data using pymongo.'))
