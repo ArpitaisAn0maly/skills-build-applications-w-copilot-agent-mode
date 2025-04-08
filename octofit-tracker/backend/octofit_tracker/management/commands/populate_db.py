@@ -16,50 +16,45 @@ class Command(BaseCommand):
         # Drop existing collections
         db.users.drop()
         db.teams.drop()
-        db.activity.drop()
+        db.activities.drop()
         db.leaderboard.drop()
         db.workouts.drop()
 
         # Create users
         users = [
-            User(_id=ObjectId(), email='thundergod@mhigh.edu', name='Thunder God'),
-            User(_id=ObjectId(), email='metalgeek@mhigh.edu', name='Metal Geek'),
-            User(_id=ObjectId(), email='zerocool@mhigh.edu', name='Zero Cool'),
-            User(_id=ObjectId(), email='crashoverride@mhigh.edu', name='Crash Override'),
-            User(_id=ObjectId(), email='sleeptoken@mhigh.edu', name='Sleep Token'),
+            User(_id=ObjectId(), username='thundergod', email='thundergod@example.com', password='password1'),
+            User(_id=ObjectId(), username='metalgeek', email='metalgeek@example.com', password='password2'),
+            User(_id=ObjectId(), username='zerocool', email='zerocool@example.com', password='password3'),
+            User(_id=ObjectId(), username='crashoverride', email='crashoverride@example.com', password='password4'),
+            User(_id=ObjectId(), username='sleeptoken', email='sleeptoken@example.com', password='password5'),
         ]
         User.objects.bulk_create(users)
 
         # Create teams
-        teams = [
-            Team(_id=ObjectId(), name='Blue Team'),
-            Team(_id=ObjectId(), name='Gold Team'),
-        ]
-        Team.objects.bulk_create(teams)
-
-        # Assign members to teams as dictionaries
-        teams[0].members = [{"_id": str(users[0]._id), "email": users[0].email, "name": users[0].name},
-                            {"_id": str(users[1]._id), "email": users[1].email, "name": users[1].name}]
-        teams[1].members = [{"_id": str(users[2]._id), "email": users[2].email, "name": users[2].name},
-                            {"_id": str(users[3]._id), "email": users[3].email, "name": users[3].name},
-                            {"_id": str(users[4]._id), "email": users[4].email, "name": users[4].name}]
-        teams[0].save()
-        teams[1].save()
+        team1 = Team(_id=ObjectId(), name='Blue Team')
+        team2 = Team(_id=ObjectId(), name='Gold Team')
+        team1.save()
+        team2.save()
+        team1.members.add(users[0], users[1])
+        team2.members.add(users[2], users[3], users[4])
 
         # Create activities
         activities = [
-            Activity(_id=ObjectId(), user=users[0], type='Cycling', duration=60),  # 1 hour in minutes
-            Activity(_id=ObjectId(), user=users[1], type='Crossfit', duration=120),  # 2 hours in minutes
-            Activity(_id=ObjectId(), user=users[2], type='Running', duration=90),  # 1.5 hours in minutes
-            Activity(_id=ObjectId(), user=users[3], type='Strength', duration=30),  # 30 minutes
-            Activity(_id=ObjectId(), user=users[4], type='Swimming', duration=75),  # 1 hour 15 minutes
+            Activity(_id=ObjectId(), user=users[0], activity_type='Cycling', duration=timedelta(hours=1)),
+            Activity(_id=ObjectId(), user=users[1], activity_type='Crossfit', duration=timedelta(hours=2)),
+            Activity(_id=ObjectId(), user=users[2], activity_type='Running', duration=timedelta(hours=1, minutes=30)),
+            Activity(_id=ObjectId(), user=users[3], activity_type='Strength', duration=timedelta(minutes=30)),
+            Activity(_id=ObjectId(), user=users[4], activity_type='Swimming', duration=timedelta(hours=1, minutes=15)),
         ]
         Activity.objects.bulk_create(activities)
 
         # Create leaderboard entries
         leaderboard_entries = [
-            Leaderboard(_id=ObjectId(), team=teams[0], score=100),
-            Leaderboard(_id=ObjectId(), team=teams[1], score=90),
+            Leaderboard(_id=ObjectId(), user=users[0], score=100),
+            Leaderboard(_id=ObjectId(), user=users[1], score=90),
+            Leaderboard(_id=ObjectId(), user=users[2], score=95),
+            Leaderboard(_id=ObjectId(), user=users[3], score=85),
+            Leaderboard(_id=ObjectId(), user=users[4], score=80),
         ]
         Leaderboard.objects.bulk_create(leaderboard_entries)
 
