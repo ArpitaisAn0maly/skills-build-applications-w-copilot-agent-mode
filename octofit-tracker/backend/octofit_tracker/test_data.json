@@ -1,0 +1,34 @@
+{
+  "users": [
+    {"username": "thundergod", "email": "thundergod@mhigh.edu", "password": "thundergodpassword"},
+    {"username": "metalgeek", "email": "metalgeek@mhigh.edu", "password": "metalgeekpassword"},
+    {"username": "zerocool", "email": "zerocool@mhigh.edu", "password": "zerocoolpassword"},
+    {"username": "crashoverride", "email": "crashoverride@hmhigh.edu", "password": "crashoverridepassword"},
+    {"username": "sleeptoken", "email": "sleeptoken@mhigh.edu", "password": "sleeptokenpassword"}
+  ],
+  "teams": [
+    {"name": "Blue Team", "members": ["thundergod", "metalgeek"]},
+    {"name": "Gold Team", "members": ["zerocool", "crashoverride", "sleeptoken"]}
+  ],
+  "activities": [
+    {"user": "thundergod", "type": "Cycling", "duration": 60, "date": "2025-04-08"},
+    {"user": "metalgeek", "type": "Crossfit", "duration": 120, "date": "2025-04-07"},
+    {"user": "zerocool", "type": "Running", "duration": 90, "date": "2025-04-06"},
+    {"user": "crashoverride", "type": "Strength", "duration": 30, "date": "2025-04-05"},
+    {"user": "sleeptoken", "type": "Swimming", "duration": 75, "date": "2025-04-04"}
+  ],
+  "leaderboard": [
+    {"user": "thundergod", "score": 100},
+    {"user": "metalgeek", "score": 90},
+    {"user": "zerocool", "score": 95},
+    {"user": "crashoverride", "score": 85},
+    {"user": "sleeptoken", "score": 80}
+  ],
+  "workouts": [
+    {"name": "Cycling Training", "description": "Training for a road cycling event"},
+    {"name": "Crossfit", "description": "Training for a crossfit competition"},
+    {"name": "Running Training", "description": "Training for a marathon"},
+    {"name": "Strength Training", "description": "Training for strength"},
+    {"name": "Swimming Training", "description": "Training for a swimming competition"}
+  ]
+}
